@@ -57,28 +57,27 @@ def bicubic(img, ratio, a):
     print('Start bicubic interpolation')
     print('It will take a little while...')
     inc = 0
-    for c in range(C):
-        for j in range(dH):
-            for i in range(dW):
-                x, y = i * h + 2, j * h + 2
+    for j in range(dH):
+        for i in range(dW):
+            x, y = i * h + 2, j * h + 2
 
-                xdec, xint = math.modf(x)
-                xds = [abs(xdec - k) for k in range(-1, 3)]
-                xint = int(xint)
-                ydec, yint = math.modf(y)
-                yds = [abs(ydec - k) for k in range(-1, 3)]
-                yint = int(yint)
+            xdec, xint = math.modf(x)
+            xds = [abs(xdec - k) for k in range(-1, 3)]
+            xint = int(xint)
+            ydec, yint = math.modf(y)
+            yds = [abs(ydec - k) for k in range(-1, 3)]
+            yint = int(yint)
 
-                mat_l = np.matrix([[u(xd, a) for xd in xds]])
+            mat_l = np.matrix([[u(xd, a) for xd in xds]])
+            mat_r = np.matrix([[u(yd, a)] for yd in yds])
+            for c in range(C):
                 mat_m = np.transpose(np.matrix(img[yint - 1:yint + 3, xint - 1:xint + 3, c]))
-                mat_r = np.matrix([[u(yd, a)] for yd in yds])
-
                 dst[j, i, c] = (mat_l @ mat_m) @ mat_r
 
-                # Print progress
-                inc = inc + 1
-                if inc % 100 == 1:
-                    print(f'\r\033[K{get_progressbar_str(inc / (C * dH * dW))}', file = sys.stderr, end='')
+            # Print progress
+            inc = inc + 1
+            if inc % 100 == 1:
+                print(f'\r\033[K{get_progressbar_str(inc / (dH * dW))}', file = sys.stderr, end='')
     print(f'\r\033[K{get_progressbar_str(1.0)}', file=sys.stderr)
     return dst
 
